@@ -1,8 +1,12 @@
 import * as React from "react";
 import * as Radium from "radium";
+import {ITayInfo} from "../models/Tay";
+import * as xhr from "xhr";
 
 @Radium
 export class DrawComponent extends React.Component<IDrawComponentProps, IDrawComponentState> {
+    static readonly TAY_INFO_URL = "/tay.json";
+
     props: IDrawComponentProps;
     state: IDrawComponentState;
 
@@ -18,16 +22,33 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
         this.state = {
             width: 600,
             height: 480,
-            mouseDown: false
+            mouseDown: false,
+            tayInfo: null,
+            loaded: false
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this.ctx = this.refs.canvas.getContext("2d");
         this.refs.canvas.width = this.state.width;
         this.refs.canvas.height = this.state.height;
 
         this.registerListeners();
+        const tayInfo = await this.fetchImageUrls();
+
+        this.setState({tayInfo});
+    }
+
+    fetchImageUrls(): Promise<ITayInfo> {
+        return new Promise<ITayInfo>((resolve, reject) => {
+            xhr.get(DrawComponent.TAY_INFO_URL, (err, resp, body) => {
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(body);
+            });
+        });
     }
 
     registerListeners() {
@@ -113,4 +134,6 @@ export interface IDrawComponentState {
     width: number;
     height: number;
     mouseDown: boolean;
+    loaded: boolean,
+    tayInfo: ITayInfo
 }
