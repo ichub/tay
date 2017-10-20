@@ -1,0 +1,143 @@
+@import "../label";
+
+.food-gallery-item-component {
+  $vert-margin: 5px;
+  $hor-margin: 20px;
+
+  margin: $vert-margin $hor-margin $vert-margin $hor-margin;
+  box-sizing: border-box;
+  display: inline-block;
+
+  .place-name {
+    font-weight: bold;
+    vertical-align: middle;
+
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
+  .status {
+    @extend .label;
+
+    $open-color: rgb(104, 216, 115);
+    $closed-color: rgb(222, 116, 115);
+
+    &.open {
+      background-color: $open-color;
+      color: darken($open-color, $label-text-darken-amount);
+    }
+
+    &.closed {
+      background-color: $closed-color;
+      color: darken($closed-color, $label-text-darken-amount);
+    }
+  }
+}
+
+.detail-modal {
+  margin: 50px 200px;
+  outline: none;
+  border: 1px solid rgb(208, 208, 208);
+
+  .title {
+    margin: 0;
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .nameAndIsOpen {
+      display: flex;
+      align-items: center;
+
+      .name {
+        font-weight: bold;
+        font-size: 2em;
+      }
+
+      .isOpen {
+        @extend .label;
+        vertical-align: middle;
+        margin-left: 10px;
+        font-size: inherit;
+        padding: 5px 10px;
+      }
+    }
+
+    .close {
+      float: right;
+      user-select: none;
+
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .content {
+    $height: 300px;
+    padding: 0px 20px 20px 20px;
+
+    .mapsLink {
+      margin-bottom: 5px;
+    }
+
+    .hours {
+      width: 50%;
+      height: $height;
+      display: block;
+      box-sizing: border-box;
+      font-size: 10pt;
+
+      tr {
+        border-collapse: collapse;
+
+        td {
+          padding: 4px 8px;
+          &.weekday {
+            font-weight: bold;
+          }
+        }
+
+        &.today {
+          background-color: #79d1ff;
+
+          td:first-child {
+            border-top-left-radius: $label-border-radius;
+          }
+          td:last-child {
+            border-top-right-radius: $label-border-radius;
+          }
+          td:first-child {
+            border-bottom-left-radius: $label-border-radius;
+          }
+          td:last-child {
+            border-bottom-right-radius: $label-border-radius;
+          }
+        }
+      }
+    }
+
+    .map {
+      border: 0;
+      width: 50%;
+      height: $height;
+      right: 0;
+      display: inline-block;
+    }
+  }
+}
+
+.detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
