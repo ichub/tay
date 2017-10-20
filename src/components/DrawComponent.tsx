@@ -18,6 +18,7 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
         this.state = {
             width: 600,
             height: 480,
+            mouseDown: false
         }
     }
 
@@ -25,17 +26,33 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
         this.ctx = this.refs.canvas.getContext("2d");
         this.refs.canvas.width = this.state.width;
         this.refs.canvas.height = this.state.height;
+
+        this.registerListeners();
+    }
+
+    registerListeners() {
+        document.addEventListener("mousedown", this.mouseDown.bind(this));
+        document.addEventListener("mouseup", this.mouseUp.bind(this));
+        document.addEventListener("mousemove", this.mouseMove.bind(this));
     }
 
     mouseDown(e: MouseEvent) {
-
+        this.setState({
+            mouseDown: true
+        });
     }
 
     mouseUp(e: MouseEvent) {
-
+        this.setState({
+            mouseDown: false
+        })
     }
 
     mouseMove(e: MouseEvent) {
+        if (!this.state.mouseDown) {
+            return;
+        }
+
         const mouse = this.getMouse(e);
 
         console.log(mouse);
@@ -62,9 +79,7 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
             ]}>
                 <canvas
                     style={DrawComponent.styles.canvas(this.state.width, this.state.height)}
-                    onMouseDown={this.mouseDown.bind(this)}
-                    onMouseUp={this.mouseUp.bind(this)}
-                    onMouseMove={this.mouseMove.bind(this)}
+
                     ref="canvas"
                     width={this.state.width}
                     height={this.state.height}></canvas>
@@ -97,4 +112,5 @@ export interface IDrawComponentProps {
 export interface IDrawComponentState {
     width: number;
     height: number;
+    mouseDown: boolean;
 }
