@@ -21,8 +21,8 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
         super();
 
         this.state = {
-            width: 600,
-            height: 480,
+            width: 800,
+            height: 600,
             tayInfo: null,
             imageMetadataLoaded: false,
             nearestTayImage: null,
