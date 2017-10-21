@@ -26,14 +26,13 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
             tayInfo: null,
             imageMetadataLoaded: false,
             nearestTayImage: null,
-            imageState: ImageState.JustLoadedPage,
+            imageState: ImageState.Initializing,
         }
     }
 
     componentDidMount() {
         this.fetchImageUrls().then(tayInfo => {
-            console.log(tayInfo);
-            this.setState({tayInfo});
+            this.setState({tayInfo: tayInfo, imageState: ImageState.Initialized});
         });
     }
 
@@ -73,6 +72,10 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
     }
 
     triggerNewImage(e: MouseEvent) {
+        if (this.state.imageState === ImageState.Initializing) {
+            return;
+        }
+
         clearTimeout(this.timeout);
         if (this.refs.img) {
             this.refs.img.onload = null;
@@ -132,14 +135,17 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
         switch (this.state.imageState) {
             case ImageState.ImageLoaded:
                 break;
-            case ImageState.JustLoadedPage:
+            case ImageState.Initializing:
+                overlayText = "initializing...";
+                break;
+            case ImageState.Initialized:
                 overlayText = "move your mouse (;";
                 break;
             case ImageState.MouseMoving:
                 overlayText = "looking for matches!";
                 break;
             case ImageState.LoadingImage:
-                overlayText = "found a match";
+                overlayText = "found a match, loading image!";
                 break;
         }
 
@@ -209,7 +215,8 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
 }
 
 enum ImageState {
-    JustLoadedPage,
+    Initializing,
+    Initialized,
     MouseMoving,
     LoadingImage,
     ImageLoaded,
