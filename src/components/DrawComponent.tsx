@@ -119,27 +119,30 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
     }
 
     render() {
-        let overlay = null;
+        let overlayText = "";
 
         switch (this.state.imageState) {
             case ImageState.ImageLoaded:
                 break;
             case ImageState.JustLoadedPage:
-                overlay = (
-                    <div style={DrawComponent.styles.overlay}>move your mouse (;</div>
-                );
+                overlayText = "move your mouse (;";
                 break;
             case ImageState.MouseMoving:
-                overlay = (
-                    <div style={DrawComponent.styles.overlay}>looking for matches!</div>
-                );
+                overlayText = "looking for matches!";
                 break;
             case ImageState.LoadingImage:
-                overlay = (
-                    <div style={DrawComponent.styles.overlay}>found a match, loading image!</div>
-                );
+                overlayText = "found a match";
                 break;
         }
+
+        let overlay = (
+            <div style={DrawComponent.styles.overlay}>{overlayText}</div>
+        );
+
+        if (this.state.imageState === ImageState.ImageLoaded) {
+            overlay = null;
+        }
+
         return (
             <div style={[
                 DrawComponent.styles.base
