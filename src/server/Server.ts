@@ -1,6 +1,8 @@
 import * as express from "express";
 import * as path from "path";
 import * as fs from "fs";
+import * as sizeOf from "image-size";
+
 import {ITayInfo} from "../models/Tay";
 
 const app = express();
@@ -27,7 +29,26 @@ app.get("/tay.json", (req, res, next) => {
         }
 
         res.send(<ITayInfo> {
-            files: files.map(file => "/images_of_tay/" + file)
+            files: files.map(fileName => {
+                const parts = fileName.split("x");
+
+                const noseLocation = {
+                    x: parseInt(parts[0], 10),
+                    y: parseInt(parts[1], 10),
+                };
+
+                const dimensions = sizeOf(path.join(tayDir, fileName));
+
+                return {
+                    url: "/images_of_tay/" + fileName,
+                    noseInPixels: noseLocation,
+                    sizeInPixels: dimensions,
+                    noseInFractions: {
+                        x: noseLocation.x / dimensions.width,
+                        y: noseLocation.y / dimensions.height
+                    }
+                }
+            })
         });
     });
 });

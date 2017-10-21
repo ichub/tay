@@ -10,10 +10,6 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
     props: IDrawComponentProps;
     state: IDrawComponentState;
 
-    refs: {
-        canvas: HTMLCanvasElement
-    };
-
     ctx: CanvasRenderingContext2D;
 
     constructor() {
@@ -22,21 +18,17 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
         this.state = {
             width: 600,
             height: 480,
-            mouseDown: false,
             tayInfo: null,
-            loaded: false
+            imageMetadataLoaded: false,
+            nearestTayImage: null
         }
     }
 
-    async componentDidMount() {
-        this.ctx = this.refs.canvas.getContext("2d");
-        this.refs.canvas.width = this.state.width;
-        this.refs.canvas.height = this.state.height;
-
-        this.registerListeners();
-        const tayInfo = await this.fetchImageUrls();
-
-        this.setState({tayInfo});
+    componentDidMount() {
+        this.fetchImageUrls().then(tayInfo => {
+            console.log(tayInfo);
+            this.setState({tayInfo});
+        });
     }
 
     fetchImageUrls(): Promise<ITayInfo> {
@@ -46,40 +38,40 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
                     return reject(err);
                 }
 
-                resolve(body);
+                resolve(JSON.parse(body));
             });
         });
     }
 
-    registerListeners() {
-        document.addEventListener("mousedown", this.mouseDown.bind(this));
-        document.addEventListener("mouseup", this.mouseUp.bind(this));
-        document.addEventListener("mousemove", this.mouseMove.bind(this));
-    }
+    findNearestTayImage(x, y): string {
+        const xFraction = x / this.state.width;
+        const yFraction = y / this.state.height;
 
-    mouseDown(e: MouseEvent) {
-        this.setState({
-            mouseDown: true
-        });
-    }
+        let nearestDistance = Number.MAX_VALUE;
+        let nearestImage = null;
 
-    mouseUp(e: MouseEvent) {
-        this.setState({
-            mouseDown: false
-        })
+        for (const info of this.state.tayInfo.files) {
+            const distance = Math.sqrt(
+                Math.pow((info.noseInFractions.x - xFraction), 2) +
+                Math.pow((info.noseInFractions.y - yFraction), 2));
+
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestImage = info;
+            }
+        }
+
+        console.log(nearestImage);
+
+        return nearestImage.url;
     }
 
     mouseMove(e: MouseEvent) {
-        if (!this.state.mouseDown) {
-            return;
-        }
-
         const mouse = this.getMouse(e);
 
-        console.log(mouse);
+        const nearestTayImage = this.findNearestTayImage(mouse.x, mouse.y);
 
-        this.ctx.fillStyle = "red";
-        this.ctx.fillRect(mouse.x, mouse.y, 10, 10);
+        this.setState({nearestTayImage})
     }
 
     getMouse(e: MouseEvent): { x: number, y: number } {
@@ -98,12 +90,11 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
             <div style={[
                 DrawComponent.styles.base
             ]}>
-                <canvas
-                    style={DrawComponent.styles.canvas(this.state.width, this.state.height)}
-
-                    ref="canvas"
-                    width={this.state.width}
-                    height={this.state.height}></canvas>
+                <img
+                    onMouseMove={this.mouseMove.bind(this)}
+                    src={this.state.nearestTayImage}
+                    style={DrawComponent.styles.img(this.state.width, this.state.height)}>
+                </img>
             </div>
         );
     }
@@ -116,7 +107,7 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
             width: "100%",
             height: "100%",
         },
-        canvas: (width: number, height: number) => {
+        img: (width: number, height: number) => {
             return {
                 width: width + "px",
                 height: height + "px",
@@ -133,7 +124,7 @@ export interface IDrawComponentProps {
 export interface IDrawComponentState {
     width: number;
     height: number;
-    mouseDown: boolean;
-    loaded: boolean,
-    tayInfo: ITayInfo
+    imageMetadataLoaded: boolean,
+    tayInfo: ITayInfo,
+    nearestTayImage: string;
 }

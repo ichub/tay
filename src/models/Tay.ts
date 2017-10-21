@@ -1,3 +1,8 @@
 export interface ITayInfo {
-    files: string[];
+    files: Array<{
+        url: string,
+        noseInPixels: { x: number, y: number },
+        sizeInPixels: { width: number, height: number },
+        noseInFractions: { x: number, y: number }
+    }>;
 }
