@@ -74,8 +74,8 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
 
     mouseMove(e: MouseEvent) {
         clearTimeout(this.timeout);
-        if (this.refs.size) {
-            this.refs.size.onload = null;
+        if (this.refs.img) {
+            this.refs.img.onload = null;
         }
 
         this.setState({
