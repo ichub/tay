@@ -28,6 +28,8 @@ app.get("/tay.json", (req, res, next) => {
             return next(err);
         }
 
+        files = files.filter(file => [".jpg", ".png"].indexOf(path.extname(file)) >= 0);
+
         res.send(<ITayInfo> {
             files: files.map(fileName => {
                 const parts = fileName.split("x");
