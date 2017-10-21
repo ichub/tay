@@ -74,8 +74,8 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
 
     mouseMove(e: MouseEvent) {
         clearTimeout(this.timeout);
-        if (this.refs.img) {
-            this.refs.img.onload = null;
+        if (this.refs.size) {
+            this.refs.size.onload = null;
         }
 
         this.setState({
@@ -83,7 +83,6 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
         });
 
         const mouse = this.getMouse(e);
-
 
         this.timeout = setTimeout(this.mouseNotMovedForAReasonableTime.bind(this, mouse), DrawComponent.MOUSE_MOVE_TIMEOUT)
     }
@@ -113,8 +112,6 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
     getMouse(e: MouseEvent): { x: number, y: number } {
         const bounds = (e.target as any).getBoundingClientRect();
 
-        console.log(bounds);
-
         return {
             x: e.clientX - bounds.left,
             y: e.clientY - bounds.top
@@ -129,17 +126,17 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
                 break;
             case ImageState.JustLoadedPage:
                 overlay = (
-                    <div>move your mouse (;</div>
+                    <div style={DrawComponent.styles.overlay}>move your mouse (;</div>
                 );
                 break;
             case ImageState.MouseMoving:
                 overlay = (
-                    <div>looking for matches!</div>
+                    <div style={DrawComponent.styles.overlay}>looking for matches!</div>
                 );
                 break;
             case ImageState.LoadingImage:
                 overlay = (
-                    <div>found a match, loading image!</div>
+                    <div style={DrawComponent.styles.overlay}>found a match, loading image!</div>
                 );
                 break;
         }
@@ -147,12 +144,15 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
             <div style={[
                 DrawComponent.styles.base
             ]}>
-                <div style={DrawComponent.styles.img(this.state.width, this.state.height)}
+                <div style={[
+                    DrawComponent.styles.imgContainer,
+                    DrawComponent.styles.size(this.state.width, this.state.height)
+                ]}
                      onMouseMove={this.mouseMove.bind(this)}>
                     {overlay}
                     <img
                         ref="img"
-                        style={DrawComponent.styles.img(this.state.width, this.state.height)}>
+                        style={DrawComponent.styles.size(this.state.width, this.state.height)}>
                     </img>
                 </div>
             </div>
@@ -167,7 +167,17 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
             width: "100%",
             height: "100%",
         },
-        img: (width: number, height: number) => {
+        overlay: {
+            width: "100%",
+            height: "100%",
+            position: "absolute",
+            top: "0",
+            left: "0"
+        },
+        imgContainer: {
+            position: "relative",
+        },
+        size: (width: number, height: number) => {
             return {
                 width: width + "px",
                 height: height + "px",
