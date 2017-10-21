@@ -176,13 +176,14 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
             position: "absolute",
             top: "0",
             left: "0",
-            backgroundColor: "grey",
+            backgroundColor: "rgb(240, 240, 240)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center"
         },
         imgContainer: {
             position: "relative",
+            boxShadow: "0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2)",
         },
         size: (width: number, height: number) => {
             return {
