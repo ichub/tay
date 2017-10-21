@@ -6,11 +6,16 @@ import * as xhr from "xhr";
 @Radium
 export class DrawComponent extends React.Component<IDrawComponentProps, IDrawComponentState> {
     static readonly TAY_INFO_URL = "/tay.json";
+    static readonly MOUSE_MOVE_TIMEOUT = 1000 * 1;
 
     props: IDrawComponentProps;
     state: IDrawComponentState;
 
-    ctx: CanvasRenderingContext2D;
+    refs = {
+        img: HTMLImageElement
+    };
+
+    private timeout = null;
 
     constructor() {
         super();
@@ -20,7 +25,8 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
             height: 480,
             tayInfo: null,
             imageMetadataLoaded: false,
-            nearestTayImage: null
+            nearestTayImage: null,
+            imageState: ImageState.JustLoadedPage,
         }
     }
 
@@ -67,11 +73,41 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
     }
 
     mouseMove(e: MouseEvent) {
+        clearTimeout(this.timeout);
+        if (this.refs.img) {
+            this.refs.img.onload = null;
+        }
+
+        this.setState({
+            imageState: ImageState.MouseMoving,
+        });
+
         const mouse = this.getMouse(e);
 
-        const nearestTayImage = this.findNearestTayImage(mouse.x, mouse.y);
 
-        this.setState({nearestTayImage})
+        this.timeout = setTimeout(this.mouseNotMovedForAReasonableTime.bind(this, mouse), DrawComponent.MOUSE_MOVE_TIMEOUT)
+    }
+
+    mouseNotMovedForAReasonableTime(lastMouse: { x: number, y: number }) {
+        this.setState({
+            imageState: ImageState.LoadingImage
+        });
+
+        const nearestTayImage = this.findNearestTayImage(lastMouse.x, lastMouse.y);
+
+        this.setImageUrl(nearestTayImage);
+    }
+
+    setImageUrl(url: string) {
+        this.refs.img.onload = () => {
+            console.log("loaded!");
+
+            this.setState({
+                imageState: ImageState.ImageLoaded
+            });
+        };
+
+        this.refs.img.src = url;
     }
 
     getMouse(e: MouseEvent): { x: number, y: number } {
@@ -86,15 +122,39 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
     }
 
     render() {
+        let overlay = null;
+
+        switch (this.state.imageState) {
+            case ImageState.ImageLoaded:
+                break;
+            case ImageState.JustLoadedPage:
+                overlay = (
+                    <div>move your mouse (;</div>
+                );
+                break;
+            case ImageState.MouseMoving:
+                overlay = (
+                    <div>looking for matches!</div>
+                );
+                break;
+            case ImageState.LoadingImage:
+                overlay = (
+                    <div>found a match, loading image!</div>
+                );
+                break;
+        }
         return (
             <div style={[
                 DrawComponent.styles.base
             ]}>
-                <img
-                    onMouseMove={this.mouseMove.bind(this)}
-                    src={this.state.nearestTayImage}
-                    style={DrawComponent.styles.img(this.state.width, this.state.height)}>
-                </img>
+                <div style={DrawComponent.styles.img(this.state.width, this.state.height)}
+                     onMouseMove={this.mouseMove.bind(this)}>
+                    {overlay}
+                    <img
+                        ref="img"
+                        style={DrawComponent.styles.img(this.state.width, this.state.height)}>
+                    </img>
+                </div>
             </div>
         );
     }
@@ -117,6 +177,13 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
     }
 }
 
+enum ImageState {
+    JustLoadedPage,
+    MouseMoving,
+    LoadingImage,
+    ImageLoaded,
+}
+
 export interface IDrawComponentProps {
 
 }
@@ -127,4 +194,5 @@ export interface IDrawComponentState {
     imageMetadataLoaded: boolean,
     tayInfo: ITayInfo,
     nearestTayImage: string;
+    imageState: ImageState;
 }
