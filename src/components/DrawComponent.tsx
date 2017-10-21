@@ -179,7 +179,9 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
             backgroundColor: "rgb(240, 240, 240)",
             display: "flex",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
+            fontFamily: "'Teko', sans-serif",
+            fontSize: "2em",
         },
         imgContainer: {
             position: "relative",
