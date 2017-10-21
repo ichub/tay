@@ -72,7 +72,7 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
         return nearestImage.url;
     }
 
-    mouseMove(e: MouseEvent) {
+    triggerNewImage(e: MouseEvent) {
         clearTimeout(this.timeout);
         if (this.refs.img) {
             this.refs.img.onload = null;
@@ -85,6 +85,14 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
         const mouse = this.getMouse(e);
 
         this.timeout = setTimeout(this.mouseNotMovedForAReasonableTime.bind(this, mouse), DrawComponent.MOUSE_MOVE_TIMEOUT)
+    }
+
+    mouseClick(e: MouseEvent) {
+        this.triggerNewImage(e);
+    }
+
+    mouseMove(e: MouseEvent) {
+        this.triggerNewImage(e);
     }
 
     mouseNotMovedForAReasonableTime(lastMouse: { x: number, y: number }) {
@@ -151,7 +159,8 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
                     DrawComponent.styles.imgContainer,
                     DrawComponent.styles.size(this.state.width, this.state.height)
                 ]}
-                     onMouseMove={this.mouseMove.bind(this)}>
+                     onMouseMove={this.mouseMove.bind(this)}
+                     onClick={this.mouseClick.bind(this)}>
                     {overlay}
                     <img
                         ref="img"
