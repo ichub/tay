@@ -21,6 +21,7 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
         super();
 
         this.state = {
+            debug: false,
             width: 600,
             height: 480,
             tayInfo: null,
@@ -203,6 +204,7 @@ export interface IDrawComponentProps {
 }
 
 export interface IDrawComponentState {
+    debug: boolean;
     width: number;
     height: number;
     imageMetadataLoaded: boolean,
