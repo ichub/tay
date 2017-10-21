@@ -169,6 +169,7 @@ export class DrawComponent extends React.Component<IDrawComponentProps, IDrawCom
             alignItems: "center",
             width: "100%",
             height: "100%",
+            cursor: "pointer"
         },
         overlay: {
             width: "100%",
