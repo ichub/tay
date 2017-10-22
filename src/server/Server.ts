@@ -75,7 +75,10 @@ app.use((err, req, res, next) => {
     res.send(err)
 });
 
-const port = 4000;
+let port = 4000;
+if (process.env.NODE_ENV === "production") {
+    port = 80;
+}
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`)
