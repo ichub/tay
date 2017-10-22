@@ -11,6 +11,7 @@ export const rootPath = path.join(__dirname, "../../");
 export const htmlDir = path.join(rootPath, "html");
 export const jsDir = path.join(rootPath, "dist", "bundle");
 export const tayDir = path.join(rootPath, "images_of_tay");
+export const faviconDir = path.join(rootPath, "favicon");
 export const cssDir = path.join(rootPath, "css");
 
 let cachedImageMetadata = null;
@@ -63,6 +64,7 @@ app.get('/', (req, res) => {
 
 app.use("/js", express.static(jsDir));
 app.use("/images_of_tay", express.static(tayDir));
+app.use("/favicon", express.static(faviconDir));
 app.use("/css", express.static(cssDir));
 
 app.get("/tay.json", (req, res, next) => {
