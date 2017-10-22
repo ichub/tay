@@ -10,8 +10,9 @@ const app = express();
 export const rootPath = path.join(__dirname, "../../");
 export const htmlDir = path.join(rootPath, "html");
 export const jsDir = path.join(rootPath, "dist", "bundle");
-export const tayDir = path.join(rootPath, "images_of_tay");
-export const faviconDir = path.join(rootPath, "favicon");
+export const resDir = path.join(rootPath, "res");
+export const tayDir = path.join(resDir, "images_of_tay");
+export const faviconDir = path.join(resDir, "favicon");
 export const cssDir = path.join(rootPath, "css");
 
 let cachedImageMetadata = null;
@@ -42,7 +43,7 @@ function getImageMetadata(): Promise<ITayInfo> {
                     const dimensions = sizeOf(path.join(tayDir, fileName));
 
                     return {
-                        url: "/images_of_tay/" + fileName,
+                        url: "/res/images_of_tay/" + fileName,
                         noseInPixels: noseLocation,
                         sizeInPixels: dimensions,
                         noseInFractions: {
@@ -63,8 +64,7 @@ app.get('/', (req, res) => {
 });
 
 app.use("/js", express.static(jsDir));
-app.use("/images_of_tay", express.static(tayDir));
-app.use("/favicon", express.static(faviconDir));
+app.use("/res", express.static(resDir));
 app.use("/css", express.static(cssDir));
 
 app.get("/tay.json", (req, res, next) => {
